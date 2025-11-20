@@ -28,7 +28,7 @@ class vect2
     bool operator!=(const vect2 &vec) const;
     vect2 operator-() const;
     friend std::ostream& operator<<(std::ostream &os, const vect2 &v);
-
+    
 };
 
 vect2 operator+(const vect2 &v1, const vect2 &v2);

@@ -46,6 +46,80 @@ bigint& bigint::operator+=(const bigint& other)
 	return *this;
 }
 
+bigint& bigint::operator++()
+{
+	*this += 1;
+	return *this;
+}
+bigint bigint::operator++(int)
+{
+	bigint tmp(*this);
+	*this += 1;
+	return tmp;
+}
+bigint& bigint::operator>>=(const bigint& other)
+{
+	unsigned long long shift = 0;
+	for (std::size_t i = 0; i < other.num.size(); i++)
+		shift = shift * 10 + (other.num[i] - '0');
+	return (*this >>= shift);
+}
+
+
+bigint& bigint::operator<<=(unsigned long long shift)
+{
+	if (shift == 0)
+		return *this;
+	while ( shift-- != 0)
+		num.push_back('0');
+	normalize();
+	return *this;
+}
+bigint& bigint::operator>>=(unsigned long long shift)
+{
+	if (shift >= num.size())
+	{
+		num = "0";
+		return *this;
+	}
+	while(shift--)
+		num.pop_back();
+	return *this;
+}
+bool bigint::operator<(const bigint& other) const
+{
+	if (num.size() != other.num.size())
+		return num.size() < other.num.size();
+	int end = num.size() -1;
+	int i = -1;
+	while (++i != end)
+		if (num[i] == other.num[i])
+			continue;
+		else
+			return num[i] < other.num[i];
+	if (num[i] == other.num[i])
+		return false;
+	else
+		return num[i] < other.num[i];
+}
+bool bigint::operator==(const bigint& other) const
+{
+	if (num.size() != other.num.size())
+		return false;
+	int end = num.size();
+	for (int i = 0; i != end; i++)
+	{
+		if (num[i] != other.num[i])
+			return false;
+	}
+	return true;
+}
+
+bool bigint::operator<=(const bigint& other) const { return (*this == other || *this < other); }
+bool bigint::operator>(const bigint& other) const {	return other < *this; }
+bool bigint::operator>=(const bigint& other) const { return (*this > other || *this == other); }
+bool bigint::operator!=(const bigint& other) const { return !(*this == other); }
+
 bigint operator+(bigint big1, const bigint &big2)
 {
 	big1 += big2;
@@ -58,3 +132,14 @@ std::ostream& operator<<(std::ostream& os, const bigint& Num)
     return os;
 }
 
+bigint operator<<(bigint value, unsigned long long shift)
+{
+	value <<= shift;
+	return value;
+}
+
+bigint operator>>(bigint value, unsigned long long shift)
+{
+	value >>= shift;
+	return value;
+}

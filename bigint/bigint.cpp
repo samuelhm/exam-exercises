@@ -3,10 +3,7 @@
 
 bigint::bigint() : num("0") {}
 bigint::bigint(const bigint &copy) : num(copy.num) {}
-bigint::bigint(unsigned long long Num) : num (std::to_string(Num))
-{
-	normalize();
-}
+bigint::bigint(unsigned long long Num) : num (std::to_string(Num)) {}
 void bigint::normalize()
 {
 	if (num.size() <= 1)
@@ -25,24 +22,20 @@ bigint& bigint::operator+=(const bigint& other)
 		int digit1 = (i >= 0) ? (num[i] - '0') : 0;
 		int digit2 = (j >= 0) ? (other.num[j] - '0') : 0;
 		int sum = digit1 + digit2 + carry;
-		if (sum > 9)
-		{
-			carry = sum / 10;
-			sum %= 10;
-		}
-		else
-			carry = 0;
+		carry = sum / 10;
+		sum %= 10;
+
 		if (i >= 0)
 			num[i]= sum + '0';
 		else
-			num.insert(num.begin(), (char)(sum + '0'));
+			num.insert(num.begin(), (sum + '0'));
 		if (i >= 0)
 			i--;
 		if (j >= 0)
 			j--;
 	}
 	if (carry != 0)
-		num.insert(num.begin(), (char)(carry + '0'));
+		num.insert(num.begin(), (carry + '0'));
 	return *this;
 }
 
@@ -104,15 +97,7 @@ bool bigint::operator<(const bigint& other) const
 }
 bool bigint::operator==(const bigint& other) const
 {
-	if (num.size() != other.num.size())
-		return false;
-	int end = num.size();
-	for (int i = 0; i != end; i++)
-	{
-		if (num[i] != other.num[i])
-			return false;
-	}
-	return true;
+	return num == other.num;
 }
 
 bool bigint::operator<=(const bigint& other) const { return (*this == other || *this < other); }

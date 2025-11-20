@@ -4,14 +4,6 @@
 bigint::bigint() : num("0") {}
 bigint::bigint(const bigint &copy) : num(copy.num) {}
 bigint::bigint(unsigned long long Num) : num (std::to_string(Num)) {}
-void bigint::normalize()
-{
-	if (num.size() <= 1)
-		return ;
-	while (num.size() > 1 && num[0] == '0')
-		num.erase(num.begin());
-}
-
 bigint& bigint::operator+=(const bigint& other)
 {
 	int i = num.size() - 1;
@@ -61,11 +53,9 @@ bigint& bigint::operator>>=(const bigint& other)
 
 bigint& bigint::operator<<=(unsigned long long shift)
 {
-	if (shift == 0)
+	if (shift == 0 || num == "0")
 		return *this;
-	while ( shift-- != 0)
-		num.push_back('0');
-	normalize();
+	num.append(shift, '0');
 	return *this;
 }
 bigint& bigint::operator>>=(unsigned long long shift)

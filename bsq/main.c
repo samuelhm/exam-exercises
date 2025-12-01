@@ -1,6 +1,44 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+ssize_t getline(char **lineptr, size_t *n, FILE *stream)
+{
+    int c;
+    size_t len = 0;
+
+    if (*lineptr == NULL || *n == 0)
+    {
+        *n = 128;
+        *lineptr = malloc(*n);
+        if (!*lineptr)
+            return -1;
+    }
+
+    while ((c = fgetc(stream)) != EOF)
+    {
+        if (len + 1 >= *n)
+        {
+            size_t new_size = *n * 2;
+            char *new_ptr = realloc(*lineptr, new_size);
+            if (!new_ptr)
+                return -1;
+            *lineptr = new_ptr;
+            *n = new_size;
+        }
+
+        (*lineptr)[len++] = (char)c;
+        if (c == '\n')
+            break;
+    }
+
+    if (len == 0 && c == EOF)
+        return -1;
+
+    (*lineptr)[len] = '\0';
+    return (ssize_t)len;
+}
+
 static int my_min(int a, int b, int c)
 {
     int m = a;
@@ -11,7 +49,7 @@ static int my_min(int a, int b, int c)
 
 
 char *parse_map(FILE *fd);
-void print_result(char *map);
+void print_result(char *map, int lines, int cols);
 void solve_map(char *map, char fill, char obstacle, char empty, int cols, int lines);
 
 
@@ -28,7 +66,6 @@ int main(int argc, char *argv[])
             fputs("map error\n", stderr);
             return (1);
         }
-        print_result(map);
         free(map);
         return (0);
     }
@@ -49,7 +86,6 @@ int main(int argc, char *argv[])
             continue;
         }
         fclose(fd);
-        print_result(map);
         free(map);
     }
     
@@ -140,6 +176,7 @@ char *parse_map(FILE *fd)
 
     }
     solve_map(map, fill, obstacle, empty, cols, lines); //guarda mapa con el simbolo fill dibujado listo para entregar
+    print_result(map, lines, cols);
     return (map);
 }
 
@@ -184,9 +221,9 @@ void solve_map(char *map, char fill, char obstacle, char empty, int cols, int li
     }
     int start_x = best_x - bigger + 1;
     int start_y = best_y - bigger + 1;
-    for (int y = start_y; y < best_y; y++)
+    for (int y = start_y; y <= best_y; y++)
     {
-        for (int x = start_x; x < best_x; x++)
+        for (int x = start_x; x <= best_x; x++)
         {
             map[y * cols + x] = fill;
         }
@@ -194,4 +231,16 @@ void solve_map(char *map, char fill, char obstacle, char empty, int cols, int li
     free(dp);
     return;
 
+}
+
+void print_result(char *map, int lines, int cols)
+{
+    for (int y = 0; y < lines; y++)
+    {
+        for (int x = 0; x < cols; x++)
+        {
+            putchar(map[y * cols + x]);
+        }
+        putchar('\n');
+    }
 }
